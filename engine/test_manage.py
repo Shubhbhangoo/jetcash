@@ -13,10 +13,10 @@ import package_source
 
 class ManagerTests(unittest.TestCase):
     def test_partial_dependencies_trigger_installation(self):
-        with patch.object(manage.shutil, "which", return_value="/usr/bin/dpkg-query"):
-            with patch.object(manage.subprocess, "run", return_value=SimpleNamespace(returncode=0, stdout="installed\n" * len(manage.PACKAGES))):
+        with patch.object(manage.shutil, "which", return_value="/usr/bin/dpkg-checkbuilddeps"):
+            with patch.object(manage.subprocess, "run", return_value=SimpleNamespace(returncode=0)):
                 self.assertTrue(manage.dependencies())
-            with patch.object(manage.subprocess, "run", return_value=SimpleNamespace(returncode=0, stdout="installed\n" * (len(manage.PACKAGES) - 1) + "not-installed\n")):
+            with patch.object(manage.subprocess, "run", return_value=SimpleNamespace(returncode=1)):
                 self.assertFalse(manage.dependencies())
 
     def test_amounts_are_exact(self):
