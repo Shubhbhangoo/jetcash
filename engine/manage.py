@@ -306,6 +306,11 @@ class Manager:
         return result
 
 def dependencies():
+    if shutil.which("dpkg-query"):
+        packages = subprocess.run(["dpkg-query", "-W", "-f=${db:Status-Status}\n", *PACKAGES],
+                                  text=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        statuses = packages.stdout.splitlines()
+        return packages.returncode == 0 and len(statuses) == len(PACKAGES) and all(status == "installed" for status in statuses)
     return all(shutil.which(name) for name in ("cmake", "g++", "ninja", "git", "pkg-config")) and subprocess.run(
         ["pkg-config", "--exists", "openssl", "libsodium", "libzmq", "libunbound", "expat", "libunwind"],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0 and Path("/usr/include/boost/program_options.hpp").exists()

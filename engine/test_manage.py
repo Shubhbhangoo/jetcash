@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 import zipfile
@@ -11,6 +12,13 @@ import manage
 import package_source
 
 class ManagerTests(unittest.TestCase):
+    def test_partial_dependencies_trigger_installation(self):
+        with patch.object(manage.shutil, "which", return_value="/usr/bin/dpkg-query"):
+            with patch.object(manage.subprocess, "run", return_value=SimpleNamespace(returncode=0, stdout="installed\n" * len(manage.PACKAGES))):
+                self.assertTrue(manage.dependencies())
+            with patch.object(manage.subprocess, "run", return_value=SimpleNamespace(returncode=0, stdout="installed\n" * (len(manage.PACKAGES) - 1) + "not-installed\n")):
+                self.assertFalse(manage.dependencies())
+
     def test_amounts_are_exact(self):
         self.assertEqual(manage.amount_atomic("0.00000001"), 1)
         self.assertEqual(manage.amount_atomic("1.12345678"), 112345678)
