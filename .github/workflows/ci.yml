@@ -1,0 +1,28 @@
+name: Build and test
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  ubuntu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: CLI unit checks
+        run: |
+          python3 engine/test_cli.py
+          python3 engine/test_manage.py
+      - name: Set up pinned C++ engine
+        run: python3 jetcash setup --no-start --jobs 2
+      - name: Source overlay replay
+        run: python3 engine/test_prepare.py
+      - name: Managed CLI integration
+        run: python3 engine/manage_smoke_test.py
+      - name: Private payments and reorganizations
+        run: python3 jetcash test
+      - name: Mainnet profile on temporary chain
+        run: python3 jetcash test-mainnet
+      - name: Source package
+        run: python3 jetcash package-source

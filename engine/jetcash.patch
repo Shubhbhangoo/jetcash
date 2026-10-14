@@ -1,0 +1,1296 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 51ff12b..8f989d9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -380,7 +380,7 @@ set(CMAKE_C_FLAGS_RELEASE "-DNDEBUG ${OPT_FLAGS_RELEASE}")
+ set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG ${OPT_FLAGS_RELEASE}")
+ 
+ # set this to 0 if per-block checkpoint needs to be disabled
+-set(PER_BLOCK_CHECKPOINT 1)
++set(PER_BLOCK_CHECKPOINT 0)
+ 
+ if(PER_BLOCK_CHECKPOINT)
+   add_definitions("-DPER_BLOCK_CHECKPOINT")
+@@ -1306,3 +1306,6 @@ if (iwyu_tool_path AND PYTHONINTERP_FOUND)
+     VERBATIM
+   )
+ endif()
++
++add_executable(jetcash-consensus-tests src/jetcash_reward_tests.cpp)
++target_link_libraries(jetcash-consensus-tests PRIVATE wallet)
+diff --git a/src/checkpoints/checkpoints.cpp b/src/checkpoints/checkpoints.cpp
+index 3dfe506..ff07749 100644
+--- a/src/checkpoints/checkpoints.cpp
++++ b/src/checkpoints/checkpoints.cpp
+@@ -195,85 +195,8 @@ namespace cryptonote
+ 
+   bool checkpoints::init_default_checkpoints(network_type nettype)
+   {
+-    if (nettype == TESTNET)
+-    {
+-      ADD_CHECKPOINT2(0,     "48ca7cd3c8de5b6a4d53d2861fbdaedca141553559f9be9520068053cda8430b", "0x1");
+-      ADD_CHECKPOINT2(1000000, "46b690b710a07ea051bc4a6b6842ac37be691089c0f7758cfeec4d5fc0b4a258", "0x7aaad7153");
+-      ADD_CHECKPOINT2(1058600, "12904f6b4d9e60fd875674e07147d2c83d6716253f046af7b894c3e81da7e1bd", "0x971efd119");
+-      ADD_CHECKPOINT2(1450000, "87562ca6786f41556b8d5b48067303a57dc5ca77155b35199aedaeca1550f5a0", "0xa639e2930e");
+-      return true;
+-    }
+-    if (nettype == STAGENET)
+-    {
+-      ADD_CHECKPOINT2(0,       "76ee3cc98646292206cd3e86f74d88b4dcc1d937088645e9b0cbca84b7ce74eb", "0x1");
+-      ADD_CHECKPOINT2(10000,   "1f8b0ce313f8b9ba9a46108bfd285c45ad7c2176871fd41c3a690d4830ce2fd5", "0x1d73ba");
+-      ADD_CHECKPOINT2(550000,  "409f68cddd8e74b37469b41c1e61250d81c5776b42264f416d5d27c4626383ed", "0x5f3d4d03e");
+-      return true;
+-    }
+-    ADD_CHECKPOINT2(1,     "771fbcd656ec1464d3a02ead5e18644030007a0fc664c0a964d30922821a8148", "0x2");
+-    ADD_CHECKPOINT2(10,    "c0e3b387e47042f72d8ccdca88071ff96bff1ac7cde09ae113dbb7ad3fe92381", "0x2a974");
+-    ADD_CHECKPOINT2(100,   "ac3e11ca545e57c49fca2b4e8c48c03c23be047c43e471e1394528b1f9f80b2d", "0x35d14b");
+-    ADD_CHECKPOINT2(1000,  "5acfc45acffd2b2e7345caf42fa02308c5793f15ec33946e969e829f40b03876", "0x36a0373");
+-    ADD_CHECKPOINT2(10000, "c758b7c81f928be3295d45e230646de8b852ec96a821eac3fea4daf3fcac0ca2", "0x60a91390");
+-    ADD_CHECKPOINT2(22231, "7cb10e29d67e1c069e6e11b17d30b809724255fee2f6868dc14cfc6ed44dfb25", "0x1e288793d");
+-    ADD_CHECKPOINT2(29556, "53c484a8ed91e4da621bb2fa88106dbde426fe90d7ef07b9c1e5127fb6f3a7f6", "0x71f64cce8");
+-    ADD_CHECKPOINT2(50000, "0fe8758ab06a8b9cb35b7328fd4f757af530a5d37759f9d3e421023231f7b31c", "0x893044b400");
+-    ADD_CHECKPOINT2(80000, "a62dcd7b536f22e003ebae8726e9e7276f63d594e264b6f0cd7aab27b66e75e3", "0x5cc113f1076");
+-    ADD_CHECKPOINT2(202612, "bbd604d2ba11ba27935e006ed39c9bfdd99b76bf4a50654bc1e1e61217962698", "0x73310a259eb2");
+-    ADD_CHECKPOINT2(202613, "e2aa337e78df1f98f462b3b1e560c6b914dec47b610698b7b7d1e3e86b6197c2", "0x733154039b97");
+-    ADD_CHECKPOINT2(202614, "c29e3dc37d8da3e72e506e31a213a58771b24450144305bcba9e70fa4d6ea6fb", "0x73319dc90cb6");
+-    ADD_CHECKPOINT2(205000, "5d3d7a26e6dc7535e34f03def711daa8c263785f73ec1fadef8a45880fde8063", "0x75fcc3d85123");
+-    ADD_CHECKPOINT2(220000, "9613f455933c00e3e33ac315cc6b455ee8aa0c567163836858c2d9caff111553", "0x89cfed0cae3c");
+-    ADD_CHECKPOINT2(230300, "bae7a80c46859db355556e3a9204a337ae8f24309926a1312323fdecf1920e61", "0x967d13e5baa9");
+-    ADD_CHECKPOINT2(230700, "93e631240ceac831da1aebfc5dac8f722c430463024763ebafa888796ceaeedf", "0x96fb9663ebe7");
+-    ADD_CHECKPOINT2(231350, "b5add137199b820e1ea26640e5c3e121fd85faa86a1e39cf7e6cc097bdeb1131", "0x97b9919177bf");
+-    ADD_CHECKPOINT2(232150, "955de8e6b6508af2c24f7334f97beeea651d78e9ade3ab18fec3763be3201aa8", "0x98a038b612e8");
+-    ADD_CHECKPOINT2(249380, "654fb0a81ce3e5caf7e3264a70f447d4bd07586c08fa50f6638cc54da0a52b2d", "0xac9739634e6d");
+-    ADD_CHECKPOINT2(460000, "75037a7aed3e765db96c75bcf908f59d690a5f3390baebb9edeafd336a1c4831", "0x167799549bdda");
+-    ADD_CHECKPOINT2(500000, "2428f0dbe49796be05ed81b347f53e1f7f44aed0abf641446ec2b94cae066b02", "0x188ce145e4ba9");
+-    ADD_CHECKPOINT2(600000, "f5828ebf7d7d1cb61762c4dfe3ccf4ecab2e1aad23e8113668d981713b7a54c5", "0x1d9f3759e1554");
+-    ADD_CHECKPOINT2(700000, "12be9b3d210b93f574d2526abb9c1ab2a881b479131fd0d4f7dac93875f503cd", "0x2201e4ee39c2c");
+-    ADD_CHECKPOINT2(825000, "56503f9ad766774b575be3aff73245e9d159be88132c93d1754764f28da2ff60", "0x27565a442d5df");
+-    ADD_CHECKPOINT2(900000, "d9958d0e7dcf91a5a7b11de225927bf7efc6eb26240315ce12372be902cc1337", "0x2a6334031546e");
+-    ADD_CHECKPOINT2(913193, "5292d5d56f6ba4de33a58d9a34d263e2cb3c6fee0aed2286fd4ac7f36d53c85f", "0x2aefe7f40f5ea");
+-    ADD_CHECKPOINT2(1000000, "a886ef5149902d8342475fee9bb296341b891ac67c4842f47a833f23c00ed721", "0x2edd71370f0e5");
+-    ADD_CHECKPOINT2(1100000, "3fd720c5c8b3072fc1ccda922dec1ef25f9ed88a1e6ad4103d0fe00b180a5903", "0x390eb0035c53a");
+-    ADD_CHECKPOINT2(1150000, "1dd16f626d18e1e988490dfd06de5920e22629c972c58b4d8daddea0038627b2", "0x422d5662e9e37");
+-    ADD_CHECKPOINT2(1200000, "fa7d13a90850882060479d100141ff84286599ae39c3277c8ea784393f882d1f", "0x4c73503fc4aa3");
+-    ADD_CHECKPOINT2(1300000, "31b34272343a44a9f4ac7de7a8fcf3b7d8a3124d7d6870affd510d2f37e74cd0", "0x723f49bc249d5");
+-    ADD_CHECKPOINT2(1390000, "a8f5649dd4ded60eedab475f2bec8c934681c07e3cf640e9be0617554f13ff6c", "0xb4bba65e2841b");
+-    ADD_CHECKPOINT2(1450000, "ac94e8860093bc7c83e4e91215cba1d663421ecf4067a0ae609c3a8b52bcfac2", "0x11a4aabdca9511");
+-    ADD_CHECKPOINT2(1530000, "01759bce497ec38e63c78b1038892169203bb78f87e488172f6b854fcd63ba7e", "0x2819ce9f9e91e5");
+-    ADD_CHECKPOINT2(1579000, "7d0d7a2346373afd41ed1e744a939fc5d474a7dbaa257be5c6fff4009e789241", "0x357a590e7dda83");
+-    ADD_CHECKPOINT2(1668900, "ac2dcaf3d2f58ffcf8391639f0f1ebafcb8eac43c49479c7c37f611868d07568", "0x474226e475cc3b");
+-    ADD_CHECKPOINT2(1775600, "1c6e01c661dc22cab939e79ec6a5272190624ce8356d2f7b958e4f9a57fdb05e", "0x5e3b9d206a27c6");
+-    ADD_CHECKPOINT2(1856000, "9b57f17f29c71a3acd8a7904b93c41fa6eb8d2b7c73936ce4f1702d14880ba29", "0x6bde5e1caccee1");
+-    ADD_CHECKPOINT2(1958000, "98a5d6e51afdf3146e0eefb10a66e8648d8d4d5c2742be8835e976ba217c9bb2", "0x79dd46d2a0971a");
+-    ADD_CHECKPOINT2(2046000, "5e867f0b8baefed9244a681df97fc885d8ab36c3dfcd24c7a3abf3b8ac8b8314", "0x9cb8b6ff2978c6");
+-    ADD_CHECKPOINT2(2092500, "c4e00820c9c7989b49153d5e90ae095a18a11d990e82fcc3be54e6ed785472b5", "0xb4e585a31369cb");
+-    ADD_CHECKPOINT2(2182500, "0d22b5f81982eff21d094af9e821dc2007e6342069e3b1a37b15d97646353124", "0xead4a874083492");
+-    ADD_CHECKPOINT2(2661600, "41c9060e8426012238e8a26da26fcb90797436896cc70886a894c2c560bcccf2", "0x2e0d87526ff161f");
+-    ADD_CHECKPOINT2(2677000, "1b9fee6246eeb176bd17d637bf252e9af54a4218675f01b4449cc0901867f9eb", "0x2f165bc1a5163ba");
+-    ADD_CHECKPOINT2(2706000, "d8eb144c5e1fe6b329ecc900ec95e7792fccff84175fb23a25ed59d7299a511c", "0x310f7d89372f705");
+-    ADD_CHECKPOINT2(2720000, "b19fb41dff15bd1016afbee9f8469f05aab715c9e5d1b974466a11fd58ecbb86", "0x3216b5851ddbb61");
+-    ADD_CHECKPOINT2(2817000, "39726d19ccaac01d150bec827b877ffae710b516bd633503662036ef4422e577", "0x3900669561954c1");
+-    ADD_CHECKPOINT2(2844000, "28fc7b446dfef5b469f5778eb72ddf32a307a5f5a9823d1c394e772349e05d40", "0x3af384ec0e97d12");
+-    ADD_CHECKPOINT2(2851000, "5bf0e47fc782263191a33f63a67db6c711781dc2a3c442e17ed901ec401be5c9", "0x3b6cd8a8ed610e8");
+-    ADD_CHECKPOINT2(2971000, "3d4cac5ac515eeabd18769ab943af85f36db51d28720def0d0e6effc2c8f5ce3", "0x436e532738b8b5b");
+-    ADD_CHECKPOINT2(2985000, "08f5e6b7301c1b6ed88268a28f8677a06e8ff943b3f9e48d3080f71f9c134bfb", "0x444b7b42a633c96");
+-    ADD_CHECKPOINT2(3088000, "bddf8ca09110d33d6d497f13a113630c2b6af1c84d4f3a6f35cb1446f2604ade", "0x4aed3615c2f8c3e");
+-    ADD_CHECKPOINT2(3102800, "083f4a34f9490403b564286e7f13fd1ed45c52c86fa47195f151594e5bc87504", "0x4bbed52d4da5dfb");
+-    ADD_CHECKPOINT2(3198000, "1d685b39be51e4e84e0af69fa78e023c7cb21de7d33acd012d0371d5f78712d5", "0x517d415fee3a816");
+-    ADD_CHECKPOINT2(3375700, "96ef57b830ef7a7ccb61ada8595a4670765b6954d8cbf45c6cf583700a676302", "0x61209b7da8a0fa6");
+-    ADD_CHECKPOINT2(3451000, "0cbc912e06e1adae11f6c9cb675d3159d225b4b04d4a6c61defe50ae1816dd60", "0x6aa5fc4226bab97");
+-    ADD_CHECKPOINT2(3482000, "629071b10ddad67bdc6156102aba8e008a754c91da252eede852fff9175a9f0a", "0x6f1063da7e70c0e");
+-    ADD_CHECKPOINT2(3516300, "fa08acbcda99fcc3cd94a749364a29fa6de9501a023cb6673d0c68fdf988b7c3", "0x738f0af4d65d459");
+-    ADD_CHECKPOINT2(3541000, "74c457bed9ceef40f31f43bb8fab804077519d45c910dcad2acf4dd8556195c7", "0x76ff158c682d218");
+-    ADD_CHECKPOINT2(3576000, "5da4891bfd06be270193bd949f2a623a2b0cb0ebfaad21c70a6cb18e418e5b6a", "0x7cb2e203e867b57");
+-    ADD_CHECKPOINT2(3609000, "2c49c7eb40959b4d7a452dcec64e65c59a8b1ebec12ffe0af42bc9468eddae56", "0x823db8bb8f45661");
+-    ADD_CHECKPOINT2(3661900, "ac392757a92123f68d63cd72f0d1410f63df1102a53b5d39fc4d53d0998b20a3", "0x8a38f2195826a97");
+-    ADD_CHECKPOINT2(3774800, "0f4c4c1ca33c35dc56cb764a94e96467df281299e9e5264a5d905309cb806488", "0x9bb1dcfc99f355c");
+-    return true;
++    (void)nettype;
++    return true; // JetCash has no upstream checkpoints.
+   }
+ 
+   bool checkpoints::load_checkpoints_from_json(const std::string &json_hashfile_fullpath)
+@@ -314,58 +237,8 @@ namespace cryptonote
+ 
+   bool checkpoints::load_checkpoints_from_dns(network_type nettype)
+   {
+-    std::vector<std::string> records;
+-
+-    // All four MoneroPulse domains have DNSSEC on and valid
+-    static const std::vector<std::string> dns_urls = { "checkpoints.moneropulse.se"
+-						     , "checkpoints.moneropulse.org"
+-						     , "checkpoints.moneropulse.net"
+-						     , "checkpoints.moneropulse.co"
+-    };
+-
+-    static const std::vector<std::string> testnet_dns_urls = { "testpoints.moneropulse.se"
+-							     , "testpoints.moneropulse.org"
+-							     , "testpoints.moneropulse.net"
+-							     , "testpoints.moneropulse.co"
+-    };
+-
+-    static const std::vector<std::string> stagenet_dns_urls = { "stagenetpoints.moneropulse.se"
+-                   , "stagenetpoints.moneropulse.org"
+-                   , "stagenetpoints.moneropulse.net"
+-                   , "stagenetpoints.moneropulse.co"
+-    };
+-
+-    if (!tools::dns_utils::load_txt_records_from_dns(records, nettype == TESTNET ? testnet_dns_urls : nettype == STAGENET ? stagenet_dns_urls : dns_urls))
+-      return true; // why true ?
+-
+-    for (const auto& record : records)
+-    {
+-      auto pos = record.find(":");
+-      if (pos != std::string::npos)
+-      {
+-        uint64_t height;
+-        crypto::hash hash;
+-
+-        // parse the first part as uint64_t,
+-        // if this fails move on to the next record
+-        std::stringstream ss(record.substr(0, pos));
+-        if (!(ss >> height))
+-        {
+-    continue;
+-        }
+-
+-        // parse the second part as crypto::hash,
+-        // if this fails move on to the next record
+-        std::string hashStr = record.substr(pos + 1);
+-        if (!epee::string_tools::hex_to_pod(hashStr, hash))
+-        {
+-    continue;
+-        }
+-
+-        ADD_CHECKPOINT(height, hashStr);
+-      }
+-    }
+-    return true;
++    (void)nettype;
++    return true; // JetCash has no upstream checkpoints.
+   }
+ 
+   bool checkpoints::load_new_checkpoints(const std::string &json_hashfile_fullpath, network_type nettype, bool dns)
+diff --git a/src/common/updates.cpp b/src/common/updates.cpp
+index 2a12907..ac3e9f7 100644
+--- a/src/common/updates.cpp
++++ b/src/common/updates.cpp
+@@ -39,65 +39,7 @@ namespace tools
+ {
+   bool check_updates(const std::string &software, const std::string &buildtag, std::string &version, std::string &hash)
+   {
+-    std::vector<std::string> records;
+-    bool found = false;
+-
+-    MDEBUG("Checking updates for " << buildtag << " " << software);
+-
+-    // All four MoneroPulse domains have DNSSEC on and valid
+-    static const std::vector<std::string> dns_urls = {
+-        "updates.moneropulse.org",
+-        "updates.moneropulse.net",
+-        "updates.moneropulse.fr",
+-        "updates.moneropulse.de",
+-        "updates.moneropulse.co",
+-        "updates.moneropulse.ch",
+-        "updates.moneropulse.se"
+-    };
+-
+-    if (!tools::dns_utils::load_txt_records_from_dns(records, dns_urls))
+-      return false;
+-
+-    for (const auto& record : records)
+-    {
+-      std::vector<std::string> fields;
+-      boost::split(fields, record, boost::is_any_of(":"));
+-      if (fields.size() != 4)
+-      {
+-        MWARNING("Updates record does not have 4 fields: " << record);
+-        continue;
+-      }
+-
+-      if (software != fields[0] || buildtag != fields[1])
+-        continue;
+-
+-      bool alnum = true;
+-      for (auto c: fields[3])
+-        if (!isalnum(c))
+-          alnum = false;
+-      if (fields[3].size() != 64 && !alnum)
+-      {
+-        MWARNING("Invalid hash: " << fields[3]);
+-        continue;
+-      }
+-
+-      // use highest version
+-      if (found)
+-      {
+-        int cmp = vercmp(version.c_str(), fields[2].c_str());
+-        if (cmp > 0)
+-          continue;
+-        if (cmp == 0 && hash != fields[3])
+-          MWARNING("Two matches found for " << software << " version " << version << " on " << buildtag);
+-      }
+-
+-      version = fields[2];
+-      hash = fields[3];
+-
+-      MINFO("Found new version " << version << " with hash " << hash);
+-      found = true;
+-    }
+-    return found;
++    return false; // JetCash never downloads Monero updates.
+   }
+ 
+   std::string get_update_url(const std::string &software, const std::string &subdir, const std::string &buildtag, const std::string &version, bool user)
+diff --git a/src/cryptonote_basic/cryptonote_basic_impl.cpp b/src/cryptonote_basic/cryptonote_basic_impl.cpp
+index c9962a0..4a075e5 100644
+--- a/src/cryptonote_basic/cryptonote_basic_impl.cpp
++++ b/src/cryptonote_basic/cryptonote_basic_impl.cpp
+@@ -1,3 +1,4 @@
++#include "jetcash_emission.hpp"
+ // Copyright (c) 2014-2022, The Monero Project
+ //
+ // All rights reserved.
+@@ -81,17 +82,11 @@ namespace cryptonote {
+     return CRYPTONOTE_MAX_TX_SIZE;
+   }
+   //-----------------------------------------------------------------------------------------------
+-  bool get_block_reward(size_t median_weight, size_t current_block_weight, uint64_t already_generated_coins, uint64_t &reward, uint8_t version) {
+-    static_assert(DIFFICULTY_TARGET_V2%60==0&&DIFFICULTY_TARGET_V1%60==0,"difficulty targets must be a multiple of 60");
+-    const int target = version < 2 ? DIFFICULTY_TARGET_V1 : DIFFICULTY_TARGET_V2;
+-    const int target_minutes = target / 60;
+-    const int emission_speed_factor = EMISSION_SPEED_FACTOR_PER_MINUTE - (target_minutes-1);
+-
+-    uint64_t base_reward = (MONEY_SUPPLY - already_generated_coins) >> emission_speed_factor;
+-    if (base_reward < FINAL_SUBSIDY_PER_MINUTE*target_minutes)
+-    {
+-      base_reward = FINAL_SUBSIDY_PER_MINUTE*target_minutes;
+-    }
++  bool get_block_reward(size_t median_weight, size_t current_block_weight, uint64_t already_generated_coins, uint64_t &reward, uint8_t version, uint64_t height) {
++    static_assert(MONEY_SUPPLY == jetcash_policy::cap, "supply constants diverged");
++    static_assert(COIN == jetcash_policy::coin, "denomination constants diverged");
++    if (already_generated_coins > MONEY_SUPPLY) return false;
++    uint64_t base_reward = std::min(jetcash_policy::subsidy(height), MONEY_SUPPLY - already_generated_coins);
+ 
+     uint64_t full_reward_zone = get_min_block_weight(version);
+ 
+@@ -122,7 +117,7 @@ namespace cryptonote {
+     div128_64(product_hi, product_lo, median_weight, &reward_hi, &reward_lo, NULL, NULL);
+     div128_64(reward_hi, reward_lo, median_weight, &reward_hi, &reward_lo, NULL, NULL);
+     assert(0 == reward_hi);
+-    assert(reward_lo < base_reward);
++    assert(base_reward == 0 ? reward_lo == 0 : reward_lo < base_reward);
+ 
+     reward = reward_lo;
+     return true;
+diff --git a/src/cryptonote_basic/cryptonote_basic_impl.h b/src/cryptonote_basic/cryptonote_basic_impl.h
+index 70c04d8..b505401 100644
+--- a/src/cryptonote_basic/cryptonote_basic_impl.h
++++ b/src/cryptonote_basic/cryptonote_basic_impl.h
+@@ -79,7 +79,7 @@ namespace cryptonote {
+   /************************************************************************/
+   size_t get_min_block_weight(uint8_t version);
+   size_t get_max_tx_size();
+-  bool get_block_reward(size_t median_weight, size_t current_block_weight, uint64_t already_generated_coins, uint64_t &reward, uint8_t version);
++  bool get_block_reward(size_t median_weight, size_t current_block_weight, uint64_t already_generated_coins, uint64_t &reward, uint8_t version, uint64_t height);
+   uint8_t get_account_address_checksum(const public_address_outer_blob& bl);
+   uint8_t get_account_integrated_address_checksum(const public_integrated_address_outer_blob& bl);
+ 
+diff --git a/src/cryptonote_basic/cryptonote_format_utils.cpp b/src/cryptonote_basic/cryptonote_format_utils.cpp
+index 84bafc5..c62c84f 100644
+--- a/src/cryptonote_basic/cryptonote_format_utils.cpp
++++ b/src/cryptonote_basic/cryptonote_format_utils.cpp
+@@ -1141,18 +1141,9 @@ namespace cryptonote
+   //---------------------------------------------------------------
+   void set_default_decimal_point(unsigned int decimal_point)
+   {
+-    switch (decimal_point)
+-    {
+-      case 12:
+-      case 9:
+-      case 6:
+-      case 3:
+-      case 0:
+-        default_decimal_point = decimal_point;
+-        break;
+-      default:
+-        ASSERT_MES_AND_THROW("Invalid decimal point specification: " << decimal_point);
+-    }
++    if (decimal_point != 8 && decimal_point != 5 && decimal_point != 2 && decimal_point != 0)
++      ASSERT_MES_AND_THROW("Invalid JetCash decimal point specification: " << decimal_point);
++    default_decimal_point = decimal_point;
+   }
+   //---------------------------------------------------------------
+   unsigned int get_default_decimal_point()
+@@ -1162,22 +1153,13 @@ namespace cryptonote
+   //---------------------------------------------------------------
+   std::string get_unit(unsigned int decimal_point)
+   {
+-    if (decimal_point == (unsigned int)-1)
+-      decimal_point = default_decimal_point;
+-    switch (decimal_point)
+-    {
+-      case 12:
+-        return "monero";
+-      case 9:
+-        return "millinero";
+-      case 6:
+-        return "micronero";
+-      case 3:
+-        return "nanonero";
+-      case 0:
+-        return "piconero";
+-      default:
+-        ASSERT_MES_AND_THROW("Invalid decimal point specification: " << decimal_point);
++    if (decimal_point == (unsigned int)-1) decimal_point = default_decimal_point;
++    switch (decimal_point) {
++      case 8: return "JET";
++      case 5: return "mJET";
++      case 2: return "uJET";
++      case 0: return "atomic";
++      default: ASSERT_MES_AND_THROW("Invalid JetCash decimal point specification: " << decimal_point);
+     }
+   }
+   //---------------------------------------------------------------
+diff --git a/src/cryptonote_config.h b/src/cryptonote_config.h
+index 82891b9..0d38b7a 100644
+--- a/src/cryptonote_config.h
++++ b/src/cryptonote_config.h
+@@ -51,9 +51,9 @@
+ #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW               60
+ 
+ // MONEY_SUPPLY - total number coins to be generated
+-#define MONEY_SUPPLY                                    ((uint64_t)(-1))
++#define MONEY_SUPPLY                                    UINT64_C(1000000000000000)
+ #define EMISSION_SPEED_FACTOR_PER_MINUTE                (20)
+-#define FINAL_SUBSIDY_PER_MINUTE                        ((uint64_t)300000000000) // 3 * pow(10, 11)
++#define FINAL_SUBSIDY_PER_MINUTE                        UINT64_C(0) // 3 * pow(10, 11)
+ 
+ #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 100
+ #define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2    60000 //size of block (bytes) after which reward for block calculated using block size
+@@ -62,22 +62,22 @@
+ #define CRYPTONOTE_LONG_TERM_BLOCK_WEIGHT_WINDOW_SIZE   100000 // size in blocks of the long term block weight median window
+ #define CRYPTONOTE_SHORT_TERM_BLOCK_WEIGHT_SURGE_FACTOR 50
+ #define CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE          600
+-#define CRYPTONOTE_DISPLAY_DECIMAL_POINT                12
++#define CRYPTONOTE_DISPLAY_DECIMAL_POINT                8
+ // COIN - number of smallest units in one coin
+-#define COIN                                            ((uint64_t)1000000000000) // pow(10, 12)
+-
+-#define FEE_PER_KB_OLD                                  ((uint64_t)10000000000) // pow(10, 10)
+-#define FEE_PER_KB                                      ((uint64_t)2000000000) // 2 * pow(10, 9)
+-#define FEE_PER_BYTE                                    ((uint64_t)300000)
+-#define DYNAMIC_FEE_PER_KB_BASE_FEE                     ((uint64_t)2000000000) // 2 * pow(10,9)
+-#define DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD            ((uint64_t)10000000000000) // 10 * pow(10,12)
+-#define DYNAMIC_FEE_PER_KB_BASE_FEE_V5                  ((uint64_t)2000000000 * (uint64_t)CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2 / CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5)
++#define COIN                                            UINT64_C(100000000) // pow(10, 12)
++
++#define FEE_PER_KB_OLD                                  ((uint64_t)1000000) // pow(10, 10)
++#define FEE_PER_KB                                      ((uint64_t)200000) // 2 * pow(10, 9)
++#define FEE_PER_BYTE                                    ((uint64_t)30)
++#define DYNAMIC_FEE_PER_KB_BASE_FEE                     ((uint64_t)200000) // 2 * pow(10,9)
++#define DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD            ((uint64_t)1000000000) // 10 * pow(10,12)
++#define DYNAMIC_FEE_PER_KB_BASE_FEE_V5                  ((uint64_t)200000 * (uint64_t)CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2 / CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5)
+ #define DYNAMIC_FEE_REFERENCE_TRANSACTION_WEIGHT         ((uint64_t)3000)
+ 
+ #define ORPHANED_BLOCKS_MAX_COUNT                       100
+ 
+ 
+-#define DIFFICULTY_TARGET_V2                            120  // seconds
++#define DIFFICULTY_TARGET_V2                            60  // seconds
+ #define DIFFICULTY_TARGET_V1                            60  // seconds - before first fork
+ #define DIFFICULTY_WINDOW                               720 // blocks
+ #define DIFFICULTY_LAG                                  15  // !!!
+@@ -162,7 +162,7 @@
+ 
+ #define RPC_IP_FAILS_BEFORE_BLOCK                       3
+ 
+-#define CRYPTONOTE_NAME                         "bitmonero"
++#define CRYPTONOTE_NAME                         "jetcash-dev"
+ #define CRYPTONOTE_BLOCKCHAINDATA_FILENAME      "data.mdb"
+ #define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME "lock.mdb"
+ #define P2P_NET_DATA_FILENAME                   "p2pstate.bin"
+@@ -221,20 +221,20 @@ namespace config
+ {
+   uint64_t const DEFAULT_FEE_ATOMIC_XMR_PER_KB = 500; // Just a placeholder!  Change me!
+   uint8_t const FEE_CALCULATION_MAX_RETRIES = 10;
+-  uint64_t const DEFAULT_DUST_THRESHOLD = ((uint64_t)2000000000); // 2 * pow(10, 9)
+-  uint64_t const BASE_REWARD_CLAMP_THRESHOLD = ((uint64_t)100000000); // pow(10, 8)
+-
+-  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 18;
+-  uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 19;
+-  uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 42;
+-  uint16_t const P2P_DEFAULT_PORT = 18080;
+-  uint16_t const RPC_DEFAULT_PORT = 18081;
+-  uint16_t const ZMQ_RPC_DEFAULT_PORT = 18082;
++  uint64_t const DEFAULT_DUST_THRESHOLD = ((uint64_t)200000); // 2 * pow(10, 9)
++  uint64_t const BASE_REWARD_CLAMP_THRESHOLD = ((uint64_t)10000); // pow(10, 8)
++
++  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 199;
++  uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 200;
++  uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 201;
++  uint16_t const P2P_DEFAULT_PORT = 41080;
++  uint16_t const RPC_DEFAULT_PORT = 41081;
++  uint16_t const ZMQ_RPC_DEFAULT_PORT = 41082;
+   boost::uuids::uuid const NETWORK_ID = { {
+-      0x12 ,0x30, 0xF1, 0x71 , 0x61, 0x04 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x10
++      0x4a, 0x45, 0x54, 0x43, 0x41, 0x53, 0x48, 0x44, 0x45, 0x56, 0x30, 0x31, 0x8d, 0x92, 0xb7, 0x10
+     } }; // Bender's nightmare
+-  std::string const GENESIS_TX = "013c01ff0001ffffffffffff03029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121017767aafcde9be00dcfd098715ebcf7f410daebc582fda69d24a28e9d0bc890d1";
+-  uint32_t const GENESIS_NONCE = 10000;
++  std::string const GENESIS_TX = "013c01ff000021017767aafcde9be00dcfd098715ebcf7f410daebc582fda69d24a28e9d0bc890d1";
++  uint32_t const GENESIS_NONCE = 41000;
+ 
+   // Hash domain separators
+   const char HASH_KEY_BULLETPROOF_EXPONENT[] = "bulletproof";
+@@ -267,32 +267,32 @@ namespace config
+ 
+   namespace testnet
+   {
+-    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 53;
+-    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 54;
+-    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 63;
+-    uint16_t const P2P_DEFAULT_PORT = 28080;
+-    uint16_t const RPC_DEFAULT_PORT = 28081;
+-    uint16_t const ZMQ_RPC_DEFAULT_PORT = 28082;
++    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 209;
++    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 210;
++    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 211;
++    uint16_t const P2P_DEFAULT_PORT = 42080;
++    uint16_t const RPC_DEFAULT_PORT = 42081;
++    uint16_t const ZMQ_RPC_DEFAULT_PORT = 42082;
+     boost::uuids::uuid const NETWORK_ID = { {
+-        0x12 ,0x30, 0xF1, 0x71 , 0x61, 0x04 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x11
++        0x4a, 0x45, 0x54, 0x43, 0x41, 0x53, 0x48, 0x44, 0x45, 0x56, 0x30, 0x31, 0x8d, 0x92, 0xb7, 0x11
+       } }; // Bender's daydream
+-    std::string const GENESIS_TX = "013c01ff0001ffffffffffff03029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121017767aafcde9be00dcfd098715ebcf7f410daebc582fda69d24a28e9d0bc890d1";
+-    uint32_t const GENESIS_NONCE = 10001;
++    std::string const GENESIS_TX = "013c01ff000021017767aafcde9be00dcfd098715ebcf7f410daebc582fda69d24a28e9d0bc890d1";
++    uint32_t const GENESIS_NONCE = 42000;
+   }
+ 
+   namespace stagenet
+   {
+-    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 24;
+-    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 25;
+-    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 36;
+-    uint16_t const P2P_DEFAULT_PORT = 38080;
+-    uint16_t const RPC_DEFAULT_PORT = 38081;
+-    uint16_t const ZMQ_RPC_DEFAULT_PORT = 38082;
++    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 219;
++    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 220;
++    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 221;
++    uint16_t const P2P_DEFAULT_PORT = 43080;
++    uint16_t const RPC_DEFAULT_PORT = 43081;
++    uint16_t const ZMQ_RPC_DEFAULT_PORT = 43082;
+     boost::uuids::uuid const NETWORK_ID = { {
+-        0x12 ,0x30, 0xF1, 0x71 , 0x61, 0x04 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x12
++        0x4a, 0x45, 0x54, 0x43, 0x41, 0x53, 0x48, 0x44, 0x45, 0x56, 0x30, 0x31, 0x8d, 0x92, 0xb7, 0x12
+       } }; // Bender's daydream
+-    std::string const GENESIS_TX = "013c01ff0001ffffffffffff0302df5d56da0c7d643ddd1ce61901c7bdc5fb1738bfe39fbe69c28a3a7032729c0f2101168d0c4ca86fb55a4cf6a36d31431be1c53a3bd7411bb24e8832410289fa6f3b";
+-    uint32_t const GENESIS_NONCE = 10002;
++    std::string const GENESIS_TX = "013c01ff00002101168d0c4ca86fb55a4cf6a36d31431be1c53a3bd7411bb24e8832410289fa6f3b";
++    uint32_t const GENESIS_NONCE = 43000;
+   }
+ }
+ 
+diff --git a/src/cryptonote_core/blockchain.cpp b/src/cryptonote_core/blockchain.cpp
+index 0375470..950683f 100644
+--- a/src/cryptonote_core/blockchain.cpp
++++ b/src/cryptonote_core/blockchain.cpp
+@@ -87,7 +87,7 @@ DISABLE_VS_WARNINGS(4267)
+ #define MERROR_VER(x) MCERROR("verify", x)
+ 
+ // used to overestimate the block reward when estimating a per kB to use
+-#define BLOCK_REWARD_OVERESTIMATE (10 * 1000000000000)
++#define BLOCK_REWARD_OVERESTIMATE (10 * COIN)
+ 
+ //------------------------------------------------------------------
+ Blockchain::Blockchain(tx_memory_pool& tx_pool) :
+@@ -1359,11 +1359,12 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
+     get_last_n_blocks_weights(last_blocks_weights, CRYPTONOTE_REWARD_BLOCKS_WINDOW);
+     median_weight = epee::misc_utils::median(last_blocks_weights);
+   }
+-  if (!get_block_reward(median_weight, cumulative_block_weight, already_generated_coins, base_reward, version))
++  if (!get_block_reward(median_weight, cumulative_block_weight, already_generated_coins, base_reward, version, boost::get<txin_gen>(b.miner_tx.vin[0]).height))
+   {
+     MERROR_VER("block weight " << cumulative_block_weight << " is bigger than allowed for this blockchain");
+     return false;
+   }
++  if (fee > MONEY_SUPPLY || base_reward > MONEY_SUPPLY - fee) return false;
+   if(base_reward + fee < money_in_use)
+   {
+     MERROR_VER("coinbase transaction spend too much money (" << print_money(money_in_use) << "). Block reward is " << print_money(base_reward + fee) << "(" << print_money(base_reward) << "+" << print_money(fee) << "), cumulative_block_weight " << cumulative_block_weight);
+@@ -3676,7 +3677,7 @@ bool Blockchain::check_fee(size_t tx_weight, uint64_t fee) const
+     median = m_current_block_cumul_weight_limit / 2;
+     const uint64_t blockchain_height = m_db->height();
+     already_generated_coins = blockchain_height ? m_db->get_block_already_generated_coins(blockchain_height - 1) : 0;
+-    if (!get_block_reward(median, 1, already_generated_coins, base_reward, version))
++    if (!get_block_reward(median, 1, already_generated_coins, base_reward, version, blockchain_height))
+       return false;
+   }
+ 
+@@ -3731,14 +3732,14 @@ void Blockchain::get_dynamic_base_fee_estimate_2021_scaling(uint64_t grace_block
+   //const uint64_t Br = DYNAMIC_FEE_REFERENCE_TRANSACTION_WEIGHT / CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5
+ 
+   //const uint64_t Fl = base_reward * Brlw / Mfw; fold Brlw from above
+-  const uint64_t Fl = base_reward * /*Brlw*/ DYNAMIC_FEE_REFERENCE_TRANSACTION_WEIGHT / (Mfw * Mfw);
++  const uint64_t Fl = std::max<uint64_t>(1, base_reward * DYNAMIC_FEE_REFERENCE_TRANSACTION_WEIGHT / (Mfw * Mfw));
+ 
+   // fold Fl into this for better precision (and to match the test cases in the PDF)
+   // const uint64_t Fn = 4 * Fl;
+-  const uint64_t Fn = 4 * base_reward * /*Brlw*/ DYNAMIC_FEE_REFERENCE_TRANSACTION_WEIGHT / (Mfw * Mfw);
++  const uint64_t Fn = std::max<uint64_t>(4, 4 * base_reward * DYNAMIC_FEE_REFERENCE_TRANSACTION_WEIGHT / (Mfw * Mfw));
+ 
+   // const uint64_t Fm = 16 * base_reward * Br / Mfw; fold Br from above
+-  const uint64_t Fm = 16 * base_reward * DYNAMIC_FEE_REFERENCE_TRANSACTION_WEIGHT / (CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5 * Mfw);
++  const uint64_t Fm = std::max<uint64_t>(16, 16 * base_reward * DYNAMIC_FEE_REFERENCE_TRANSACTION_WEIGHT / (CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5 * Mfw));
+ 
+   // const uint64_t Fp = 2 * base_reward / Mnw;
+ 
+@@ -3785,7 +3786,7 @@ void Blockchain::get_dynamic_base_fee_estimate_2021_scaling(uint64_t grace_block
+ 
+   uint64_t already_generated_coins = db_height ? m_db->get_block_already_generated_coins(db_height - 1) : 0;
+   uint64_t base_reward;
+-  if (!get_block_reward(m_current_block_cumul_weight_limit / 2, 1, already_generated_coins, base_reward, version))
++  if (!get_block_reward(m_current_block_cumul_weight_limit / 2, 1, already_generated_coins, base_reward, version, db_height))
+   {
+     MERROR("Failed to determine block reward, using placeholder " << print_money(BLOCK_REWARD_OVERESTIMATE) << " as a high bound");
+     base_reward = BLOCK_REWARD_OVERESTIMATE;
+@@ -3826,7 +3827,7 @@ uint64_t Blockchain::get_dynamic_base_fee_estimate(uint64_t grace_blocks) const
+ 
+   uint64_t already_generated_coins = db_height ? m_db->get_block_already_generated_coins(db_height - 1) : 0;
+   uint64_t base_reward;
+-  if (!get_block_reward(m_current_block_cumul_weight_limit / 2, 1, already_generated_coins, base_reward, version))
++  if (!get_block_reward(m_current_block_cumul_weight_limit / 2, 1, already_generated_coins, base_reward, version, db_height))
+   {
+     MERROR("Failed to determine block reward, using placeholder " << print_money(BLOCK_REWARD_OVERESTIMATE) << " as a high bound");
+     base_reward = BLOCK_REWARD_OVERESTIMATE;
+diff --git a/src/cryptonote_core/cryptonote_core.cpp b/src/cryptonote_core/cryptonote_core.cpp
+index 314741a..4c7edcf 100644
+--- a/src/cryptonote_core/cryptonote_core.cpp
++++ b/src/cryptonote_core/cryptonote_core.cpp
+@@ -675,6 +675,7 @@ namespace cryptonote
+       0
+     };
+     const difficulty_type fixed_difficulty = command_line::get_arg(vm, arg_fixed_difficulty);
++    CHECK_AND_ASSERT_MES(m_nettype == FAKECHAIN || fixed_difficulty == 0, false, "Fixed difficulty is restricted to --regtest");
+     r = m_blockchain_storage.init(db.release(), m_nettype, m_offline, regtest ? &regtest_test_options : test_options, fixed_difficulty, get_checkpoints);
+     CHECK_AND_ASSERT_MES(r, false, "Failed to initialize blockchain storage");
+ 
+diff --git a/src/cryptonote_core/cryptonote_tx_utils.cpp b/src/cryptonote_core/cryptonote_tx_utils.cpp
+index 2b234a1..505d0c8 100644
+--- a/src/cryptonote_core/cryptonote_tx_utils.cpp
++++ b/src/cryptonote_core/cryptonote_tx_utils.cpp
+@@ -116,7 +116,7 @@ namespace cryptonote
+     in.height = height;
+ 
+     uint64_t block_reward;
+-    if(!get_block_reward(median_weight, current_block_weight, already_generated_coins, block_reward, hard_fork_version))
++    if(!get_block_reward(median_weight, current_block_weight, already_generated_coins, block_reward, hard_fork_version, height))
+     {
+       LOG_PRINT_L0("Block is too big");
+       return false;
+diff --git a/src/cryptonote_core/tx_pool.cpp b/src/cryptonote_core/tx_pool.cpp
+index 9b4adab..bd091b3 100644
+--- a/src/cryptonote_core/tx_pool.cpp
++++ b/src/cryptonote_core/tx_pool.cpp
+@@ -1569,7 +1569,7 @@ namespace cryptonote
+     fee = 0;
+     
+     //baseline empty block
+-    if (!get_block_reward(median_weight, total_weight, already_generated_coins, best_coinbase, version))
++    if (!get_block_reward(median_weight, total_weight, already_generated_coins, best_coinbase, version, m_blockchain.get_current_blockchain_height()))
+     {
+       MERROR("Failed to get block reward for empty block");
+       return false;
+@@ -1624,7 +1624,7 @@ namespace cryptonote
+         // If we're getting lower coinbase tx,
+         // stop including more tx
+         uint64_t block_reward;
+-        if(!get_block_reward(median_weight, total_weight + meta.weight, already_generated_coins, block_reward, version))
++        if(!get_block_reward(median_weight, total_weight + meta.weight, already_generated_coins, block_reward, version, m_blockchain.get_current_blockchain_height()))
+         {
+           LOG_PRINT_L2("  would exceed maximum block weight");
+           continue;
+diff --git a/src/daemon/CMakeLists.txt b/src/daemon/CMakeLists.txt
+index 455f724..4c40aae 100644
+--- a/src/daemon/CMakeLists.txt
++++ b/src/daemon/CMakeLists.txt
+@@ -71,5 +71,5 @@ target_link_libraries(daemon
+     ${Blocks})
+ set_property(TARGET daemon
+   PROPERTY
+-    OUTPUT_NAME "monerod")
++    OUTPUT_NAME "jetcashd")
+ install(TARGETS daemon DESTINATION bin)
+diff --git a/src/daemon/main.cpp b/src/daemon/main.cpp
+index a61fbda..a5c33e4 100644
+--- a/src/daemon/main.cpp
++++ b/src/daemon/main.cpp
+@@ -192,7 +192,7 @@ int main(int argc, char const * argv[])
+ 
+     if (command_line::get_arg(vm, command_line::arg_help))
+     {
+-      std::cout << "Monero '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL << ENDL;
++      std::cout << "JetCash dev (Monero-derived) '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL << ENDL;
+       std::cout << "Usage: " + std::string{argv[0]} + " [options|settings] [daemon_command...]" << std::endl << std::endl;
+       std::cout << visible_options << std::endl;
+       return 0;
+@@ -201,7 +201,7 @@ int main(int argc, char const * argv[])
+     // Monero Version
+     if (command_line::get_arg(vm, command_line::arg_version))
+     {
+-      std::cout << "Monero '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL;
++      std::cout << "JetCash dev (Monero-derived) '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL;
+       return 0;
+     }
+ 
+@@ -248,9 +248,9 @@ int main(int argc, char const * argv[])
+     }
+ 
+     try { cryptonote::core::get_network_type_from_args(vm); }
+-    catch (const std::runtime_error&)
++    catch (const std::runtime_error& error)
+     {
+-      std::cerr << "Can't specify more than one of --tesnet and --stagenet and --regtest" << ENDL;
++      std::cerr << error.what() << ENDL;
+       return 1;
+     }
+ 
+@@ -306,7 +306,7 @@ int main(int argc, char const * argv[])
+       tools::set_max_concurrency(command_line::get_arg(vm, daemon_args::arg_max_concurrency));
+ 
+     // logging is now set up
+-    MGINFO("Monero '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")");
++    MGINFO("JetCash dev (Monero-derived) '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")");
+ 
+     // If there are positional options, we're running a daemon command
+     {
+diff --git a/src/hardforks/hardforks.cpp b/src/hardforks/hardforks.cpp
+index 336ef65..5a4d422 100644
+--- a/src/hardforks/hardforks.cpp
++++ b/src/hardforks/hardforks.cpp
+@@ -32,97 +32,21 @@
+ #define MONERO_DEFAULT_LOG_CATEGORY "blockchain.hardforks"
+ 
+ const hardfork_t mainnet_hard_forks[] = {
+-  // version 1 from the start of the blockchain
+-  { 1, 1, 0, 1341378000 },
+-
+-  // version 2 starts from block 1009827, which is on or around the 20th of March, 2016. Fork time finalised on 2015-09-20. No fork voting occurs for the v2 fork.
+-  { 2, 1009827, 0, 1442763710 },
+-
+-  // version 3 starts from block 1141317, which is on or around the 24th of September, 2016. Fork time finalised on 2016-03-21.
+-  { 3, 1141317, 0, 1458558528 },
+-
+-  // version 4 starts from block 1220516, which is on or around the 5th of January, 2017. Fork time finalised on 2016-09-18.
+-  { 4, 1220516, 0, 1483574400 },
+-
+-  // version 5 starts from block 1288616, which is on or around the 15th of April, 2017. Fork time finalised on 2017-03-14.
+-  { 5, 1288616, 0, 1489520158 }, 
+-
+-  // version 6 starts from block 1400000, which is on or around the 16th of September, 2017. Fork time finalised on 2017-08-18.
+-  { 6, 1400000, 0, 1503046577 },
+-
+-  // version 7 starts from block 1546000, which is on or around the 6th of April, 2018. Fork time finalised on 2018-03-17.
+-  { 7, 1546000, 0, 1521303150 },
+-
+-  // version 8 starts from block 1685555, which is on or around the 18th of October, 2018. Fork time finalised on 2018-09-02.
+-  { 8, 1685555, 0, 1535889547 },
+-
+-  // version 9 starts from block 1686275, which is on or around the 19th of October, 2018. Fork time finalised on 2018-09-02.
+-  { 9, 1686275, 0, 1535889548 },
+-
+-  // version 10 starts from block 1788000, which is on or around the 9th of March, 2019. Fork time finalised on 2019-02-10.
+-  { 10, 1788000, 0, 1549792439 },
+-
+-  // version 11 starts from block 1788720, which is on or around the 10th of March, 2019. Fork time finalised on 2019-02-15.
+-  { 11, 1788720, 0, 1550225678 },
+-
+-  // version 12 starts from block 1978433, which is on or around the 30th of November, 2019. Fork time finalised on 2019-10-18.
+-  { 12, 1978433, 0, 1571419280 },
+-
+-  { 13, 2210000, 0, 1598180817 },
+-  { 14, 2210720, 0, 1598180818 },
+-
+-  { 15, 2688888, 0, 1656629117 },
+-  { 16, 2689608, 0, 1656629118 },
++  { 1, 0, 0, 0 },
++  { 16, 1, 0, 1 },
+ };
+ const size_t num_mainnet_hard_forks = sizeof(mainnet_hard_forks) / sizeof(mainnet_hard_forks[0]);
+-const uint64_t mainnet_hard_fork_version_1_till = 1009826;
++const uint64_t mainnet_hard_fork_version_1_till = 0;
+ 
+ const hardfork_t testnet_hard_forks[] = {
+-  // version 1 from the start of the blockchain
+-  { 1, 1, 0, 1341378000 },
+-
+-  // version 2 starts from block 624634, which is on or around the 23rd of November, 2015. Fork time finalised on 2015-11-20. No fork voting occurs for the v2 fork.
+-  { 2, 624634, 0, 1445355000 },
+-
+-  // versions 3-5 were passed in rapid succession from September 18th, 2016
+-  { 3, 800500, 0, 1472415034 },
+-  { 4, 801219, 0, 1472415035 },
+-  { 5, 802660, 0, 1472415036 + 86400*180 }, // add 5 months on testnet to shut the update warning up since there's a large gap to v6
+-
+-  { 6, 971400, 0, 1501709789 },
+-  { 7, 1057027, 0, 1512211236 },
+-  { 8, 1057058, 0, 1533211200 },
+-  { 9, 1057778, 0, 1533297600 },
+-  { 10, 1154318, 0, 1550153694 },
+-  { 11, 1155038, 0, 1550225678 },
+-  { 12, 1308737, 0, 1569582000 },
+-  { 13, 1543939, 0, 1599069376 },
+-  { 14, 1544659, 0, 1599069377 },
+-  { 15, 1982800, 0, 1652727000 },
+-  { 16, 1983520, 0, 1652813400 },
++  { 1, 0, 0, 0 },
++  { 16, 1, 0, 1 },
+ };
+ const size_t num_testnet_hard_forks = sizeof(testnet_hard_forks) / sizeof(testnet_hard_forks[0]);
+-const uint64_t testnet_hard_fork_version_1_till = 624633;
++const uint64_t testnet_hard_fork_version_1_till = 0;
+ 
+ const hardfork_t stagenet_hard_forks[] = {
+-  // version 1 from the start of the blockchain
+-  { 1, 1, 0, 1341378000 },
+-
+-  // versions 2-7 in rapid succession from March 13th, 2018
+-  { 2, 32000, 0, 1521000000 },
+-  { 3, 33000, 0, 1521120000 },
+-  { 4, 34000, 0, 1521240000 },
+-  { 5, 35000, 0, 1521360000 },
+-  { 6, 36000, 0, 1521480000 },
+-  { 7, 37000, 0, 1521600000 },
+-  { 8, 176456, 0, 1537821770 },
+-  { 9, 177176, 0, 1537821771 },
+-  { 10, 269000, 0, 1550153694 },
+-  { 11, 269720, 0, 1550225678 },
+-  { 12, 454721, 0, 1571419280 },
+-  { 13, 675405, 0, 1598180817 },
+-  { 14, 676125, 0, 1598180818 },
+-  { 15, 1151000, 0, 1656629117 },
+-  { 16, 1151720, 0, 1656629118 },
++  { 1, 0, 0, 0 },
++  { 16, 1, 0, 1 },
+ };
+ const size_t num_stagenet_hard_forks = sizeof(stagenet_hard_forks) / sizeof(stagenet_hard_forks[0]);
+diff --git a/src/p2p/net_node.inl b/src/p2p/net_node.inl
+index 9dd2d8a..703acfd 100644
+--- a/src/p2p/net_node.inl
++++ b/src/p2p/net_node.inl
+@@ -718,188 +718,20 @@ namespace nodetool
+   template<class t_payload_net_handler>
+   std::set<std::string> node_server<t_payload_net_handler>::get_ip_seed_nodes() const
+   {
+-    std::set<std::string> full_addrs;
+-    if (m_nettype == cryptonote::TESTNET)
+-    {
+-      full_addrs.insert("176.9.0.187:28080");
+-      full_addrs.insert("192.99.8.110:28080");
+-      full_addrs.insert("37.187.74.171:28080");
+-      full_addrs.insert("88.99.195.15:28080");
+-      full_addrs.insert("5.104.84.64:28080");
+-    }
+-    else if (m_nettype == cryptonote::STAGENET)
+-    {
+-      full_addrs.insert("176.9.0.187:38080");
+-      full_addrs.insert("192.99.8.110:38080");
+-      full_addrs.insert("37.187.74.171:38080");
+-      full_addrs.insert("88.99.195.15:38080");
+-      full_addrs.insert("5.104.84.64:38080");
+-    }
+-    else if (m_nettype == cryptonote::FAKECHAIN)
+-    {
+-    }
+-    else
+-    {
+-      full_addrs.insert("176.9.0.187:18080");
+-      full_addrs.insert("88.198.163.90:18080");
+-      full_addrs.insert("192.99.8.110:18080");
+-      full_addrs.insert("37.187.74.171:18080");
+-      full_addrs.insert("88.99.195.15:18080");
+-      full_addrs.insert("5.104.84.64:18080");
+-    }
+-    return full_addrs;
++    return {}; // Explicit JetCash peers only.
+   }
+   //-----------------------------------------------------------------------------------
+   template<class t_payload_net_handler>
+   std::set<std::string> node_server<t_payload_net_handler>::get_dns_seed_nodes()
+   {
+-    if (!m_exclusive_peers.empty() || m_offline)
+-    {
+-      return {};
+-    }
+-    if (m_nettype == cryptonote::TESTNET)
+-    {
+-      return get_ip_seed_nodes();
+-    }
+-    if (m_nettype == cryptonote::STAGENET)
+-    {
+-      return get_ip_seed_nodes();
+-    }
+-    if (m_nettype == cryptonote::FAKECHAIN)
+-    {
+-      return {};
+-    }
+-    if (!m_enable_dns_seed_nodes)
+-    {
+-      // TODO: a domain can be set through socks, so that the remote side does the lookup for the DNS seed nodes.
+-      m_fallback_seed_nodes_added.test_and_set();
+-      return get_ip_seed_nodes();
+-    }
+-
+-    std::set<std::string> full_addrs;
+-
+-    // for each hostname in the seed nodes list, attempt to DNS resolve and
+-    // add the result addresses as seed nodes
+-    // TODO: at some point add IPv6 support, but that won't be relevant
+-    // for some time yet.
+-
+-    struct frame_t
+-    {
+-      std::vector<std::vector<std::string>> dns_results;
+-      boost::mutex sync;
+-    };
+-
+-    const auto frame = std::make_shared<frame_t>();
+-    frame->dns_results.resize(m_seed_nodes_list.size());
+-
+-    // some libc implementation provide only a very small stack
+-    // for threads, e.g. musl only gives +- 80kb, which is not
+-    // enough to do a resolve with unbound. we request a stack
+-    // of 1 mb, which should be plenty
+-    boost::thread::attributes thread_attributes;
+-    thread_attributes.set_stack_size(1024*1024);
+-
+-    std::list<boost::thread> dns_threads;
+-    uint64_t result_index = 0;
+-    const std::weak_ptr<frame_t> frame_weak{frame};
+-    for (const std::string& addr_str : m_seed_nodes_list)
+-    {
+-      boost::thread th = boost::thread(thread_attributes, [frame_weak, addr_str, result_index]
+-      {
+-        MDEBUG("dns_threads[" << result_index << "] created for: " << addr_str);
+-        // TODO: care about dnssec avail/valid
+-        bool avail, valid;
+-        std::vector<std::string> addr_list = tools::DNSResolver::instance().get_ipv4(addr_str, avail, valid);
+-        MINFO("dns_threads[" << result_index << "] addr_str: " << addr_str << "  number of results: " << addr_list.size());
+-        const auto frame = frame_weak.lock();
+-        if (frame)
+-        {
+-          const boost::lock_guard<boost::mutex> lock{frame->sync};
+-          frame->dns_results.at(result_index) = std::move(addr_list);
+-        }
+-      });
+-
+-      dns_threads.push_back(std::move(th));
+-      ++result_index;
+-    }
+-
+-    MDEBUG("dns_threads created, now waiting for completion or timeout of " << CRYPTONOTE_DNS_TIMEOUT_MS << "ms");
+-    boost::chrono::system_clock::time_point deadline = boost::chrono::system_clock::now() + boost::chrono::milliseconds(CRYPTONOTE_DNS_TIMEOUT_MS);
+-    uint64_t i = 0;
+-    for (boost::thread& th : dns_threads)
+-    {
+-      if (! th.try_join_until(deadline))
+-      {
+-        MWARNING("dns_threads[" << i << "] timed out");
+-        th.detach();
+-      }
+-      ++i;
+-    }
+-
+-    i = 0;
+-    const boost::lock_guard<boost::mutex> lock{frame->sync};
+-    for (const auto& result : frame->dns_results)
+-    {
+-      MDEBUG("DNS lookup for " << m_seed_nodes_list[i] << ": " << result.size() << " results");
+-      // if no results for node, thread's lookup likely timed out
+-      if (result.size())
+-      {
+-        for (const auto& addr_string : result)
+-          full_addrs.insert(addr_string + ":" + std::to_string(cryptonote::get_config(m_nettype).P2P_DEFAULT_PORT));
+-      }
+-      ++i;
+-    }
+-
+-    // append the fallback nodes if we have too few seed nodes to start with
+-    if (full_addrs.size() < MIN_WANTED_SEED_NODES)
+-    {
+-      if (full_addrs.empty())
+-        MINFO("DNS seed node lookup either timed out or failed, falling back to defaults");
+-      else
+-        MINFO("Not enough DNS seed nodes found, using fallback defaults too");
+-
+-      for (const auto &peer: get_ip_seed_nodes())
+-        full_addrs.insert(peer);
+-      m_fallback_seed_nodes_added.test_and_set();
+-    }
+-
+-    return full_addrs;
++    return {};
+   }
+   //-----------------------------------------------------------------------------------
+   template<class t_payload_net_handler>
+   std::set<std::string> node_server<t_payload_net_handler>::get_seed_nodes(epee::net_utils::zone zone)
+   {
+-    switch (zone)
+-    {
+-    case epee::net_utils::zone::public_:
+-      return get_dns_seed_nodes();
+-    case epee::net_utils::zone::tor:
+-      if (m_nettype == cryptonote::MAINNET)
+-      {
+-        return {
+-          "zbjkbsxc5munw3qusl7j2hpcmikhqocdf4pqhnhtpzw5nt5jrmofptid.onion:18083",
+-          "plowsof3t5hogddwabaeiyrno25efmzfxyro2vligremt7sxpsclfaid.onion:18083",
+-          "plowsoffjexmxalw73tkjmf422gq6575fc7vicuu4javzn2ynnte6tyd.onion:18083",
+-          "plowsofe6cleftfmk2raiw5h2x66atrik3nja4bfd3zrfa2hdlgworad.onion:18083",
+-          "aclc4e2jhhtr44guufbnwk5bzwhaecinax4yip4wr4tjn27sjsfg6zqd.onion:18083",
+-          "lykcas4tus7mkm4bhsgqe4drtd4awi7gja24goscc47xfgzj54yofyqd.onion:18083",
+-        };
+-      }
+-      return {};
+-    case epee::net_utils::zone::i2p:
+-      if (m_nettype == cryptonote::MAINNET)
+-      {
+-        return {
+-          "uqj3aphckqtjsitz7kxx5flqpwjlq5ppr3chazfued7xucv3nheq.b32.i2p",
+-          "vdmnehdjkpkg57nthgnjfuaqgku673r5bpbqg56ix6fyqoywgqrq.b32.i2p",
+-          "ugnlcdciyhghh2zert7c3kl4biwkirc43ke33jiy5slnd3mv2trq.b32.i2p",
+-        };
+-      }
+-      return {};
+-    default:
+-      break;
+-    }
+-    throw std::logic_error{"Bad zone given to get_seed_nodes"};
++    (void)zone;
++    return {};
+   }
+   //-----------------------------------------------------------------------------------
+   template<class t_payload_net_handler>
+@@ -941,6 +773,7 @@ namespace nodetool
+     else
+     {
+       memcpy(&m_network_id, &::config::NETWORK_ID, 16);
++      if (m_nettype == cryptonote::FAKECHAIN) m_network_id.data[15] = 0x7f;
+     }
+ 
+     m_config_folder = command_line::get_arg(vm, cryptonote::arg_data_dir);
+@@ -2137,55 +1970,7 @@ namespace nodetool
+   template<class t_payload_net_handler>
+   bool node_server<t_payload_net_handler>::update_dns_blocklist()
+   {
+-    if (!m_enable_dns_blocklist)
+-      return true;
+-    if (m_nettype != cryptonote::MAINNET)
+-      return true;
+-
+-    static const std::vector<std::string> dns_urls = {
+-      "blocklist.moneropulse.se"
+-    , "blocklist.moneropulse.org"
+-    , "blocklist.moneropulse.net"
+-    , "blocklist.moneropulse.co"
+-    , "blocklist.moneropulse.fr"
+-    , "blocklist.moneropulse.de"
+-    , "blocklist.moneropulse.ch"
+-    };
+-
+-    std::vector<std::string> records;
+-    if (!tools::dns_utils::load_txt_records_from_dns(records, dns_urls))
+-      return true;
+-
+-    unsigned good = 0, bad = 0;
+-    for (const auto& record : records)
+-    {
+-      std::vector<std::string> ips;
+-      boost::split(ips, record, boost::is_any_of(";"));
+-      for (const auto &ip: ips)
+-      {
+-        if (ip.empty())
+-          continue;
+-        auto subnet = net::get_ipv4_subnet_address(ip);
+-        if (subnet)
+-        {
+-          block_subnet(*subnet, DNS_BLOCKLIST_LIFETIME);
+-          ++good;
+-          continue;
+-        }
+-        const expect<epee::net_utils::network_address> parsed_addr = net::get_network_address(ip, 0);
+-        if (parsed_addr)
+-        {
+-          block_host(*parsed_addr, DNS_BLOCKLIST_LIFETIME, true);
+-          ++good;
+-          continue;
+-        }
+-        MWARNING("Invalid IP address or subnet from DNS blocklist: " << ip << " - " << parsed_addr.error());
+-        ++bad;
+-      }
+-    }
+-    if (good > 0)
+-      MINFO(good << " addresses added to the blocklist");
+-    return true;
++    return true; // Upstream blocklists are not JetCash authority.
+   }
+   //-----------------------------------------------------------------------------------
+   template<class t_payload_net_handler>
+diff --git a/src/simplewallet/CMakeLists.txt b/src/simplewallet/CMakeLists.txt
+index b659d9f..bb4d959 100644
+--- a/src/simplewallet/CMakeLists.txt
++++ b/src/simplewallet/CMakeLists.txt
+@@ -61,5 +61,5 @@ target_link_libraries(simplewallet
+     ${EXTRA_LIBRARIES})
+ set_property(TARGET simplewallet
+   PROPERTY
+-    OUTPUT_NAME "monero-wallet-cli")
++    OUTPUT_NAME "jetcash-wallet-cli")
+ install(TARGETS simplewallet DESTINATION bin)
+diff --git a/src/simplewallet/simplewallet.cpp b/src/simplewallet/simplewallet.cpp
+index 1553a0d..1a45087 100644
+--- a/src/simplewallet/simplewallet.cpp
++++ b/src/simplewallet/simplewallet.cpp
+@@ -2716,15 +2716,13 @@ bool simple_wallet::set_unit(const std::vector<std::string> &args/* = std::vecto
+   const std::string &unit = args[1];
+   unsigned int decimal_point = CRYPTONOTE_DISPLAY_DECIMAL_POINT;
+ 
+-  if (unit == "monero")
++  if (unit == "JET")
+     decimal_point = CRYPTONOTE_DISPLAY_DECIMAL_POINT;
+-  else if (unit == "millinero")
++  else if (unit == "mJET")
+     decimal_point = CRYPTONOTE_DISPLAY_DECIMAL_POINT - 3;
+-  else if (unit == "micronero")
++  else if (unit == "uJET")
+     decimal_point = CRYPTONOTE_DISPLAY_DECIMAL_POINT - 6;
+-  else if (unit == "nanonero")
+-    decimal_point = CRYPTONOTE_DISPLAY_DECIMAL_POINT - 9;
+-  else if (unit == "piconero")
++  else if (unit == "atomic")
+     decimal_point = 0;
+   else
+   {
+@@ -3275,7 +3273,7 @@ bool simple_wallet::help(const std::vector<std::string> &args/* = std::vector<st
+     message_writer() << tr("\"balance\" - Show balance.");
+     message_writer() << tr("\"address all\" - Show all addresses.");
+     message_writer() << tr("\"address new\" - Create new subaddress.");
+-    message_writer() << tr("\"transfer <address> <amount>\" - Send XMR to an address.");
++    message_writer() << tr("\"transfer <address> <amount>\" - Send JET to an address.");
+     message_writer() << tr("\"show_transfers [in|out|pending|failed|pool]\" - Show transactions.");
+     message_writer() << tr("\"sweep_all <address>\" - Send whole balance to another wallet.");
+     message_writer() << tr("\"seed\" - Show secret 25 words that can be used to recover this wallet.");
+@@ -3284,7 +3282,7 @@ bool simple_wallet::help(const std::vector<std::string> &args/* = std::vector<st
+     message_writer() << tr("\"version\" - Check software version.");
+     message_writer() << tr("\"exit\" - Exit wallet.");
+     message_writer() << "";
+-    message_writer() << tr("\"donate <amount>\" - Donate XMR to the development team.");
++    message_writer() << tr("\"donate <amount>\" - Donate JET to the development team.");
+     message_writer() << "";
+   }
+   else if ((args.size() == 1) && (args.front() == "all"))
+@@ -3425,7 +3423,7 @@ simple_wallet::simple_wallet()
+                            tr("Show the blockchain height."));
+   m_cmd_binder.set_handler("transfer", boost::bind(&simple_wallet::on_command, this, &simple_wallet::transfer, _1),
+                            tr(USAGE_TRANSFER),
+-                           tr("Transfer <address> <amount>. If the parameter \"index=<N1>[,<N2>,...]\" is specified, the wallet uses outputs received by addresses of those indices. If omitted, the wallet randomly chooses address indices to be used. In any case, it tries its best not to combine outputs across multiple addresses. <priority> is the priority of the transaction. The higher the priority, the higher the transaction fee. Valid values in priority order (from lowest to highest) are: unimportant, normal, elevated, priority. If omitted, the default value (see the command \"set priority\") is used. <ring_size> is the number of inputs to include for untraceability. Multiple payments can be made at once by adding URI_2 or <address_2> <amount_2> etcetera (before the payment ID, if it's included). The \"subtractfeefrom=\" list allows you to choose which destinations to fund the tx fee from instead of the change output. The fee will be split across the chosen destinations proportionally equally. For example, to make 3 transfers where the fee is taken from the first and third destinations, one could do: \"transfer <addr1> 3 <addr2> 0.5 <addr3> 1 subtractfeefrom=0,2\". Let's say the tx fee is 0.1. The balance would drop by exactly 4.5 XMR including fees, and addr1 & addr3 would receive 2.925 & 0.975 XMR, respectively. Use \"subtractfeefrom=all\" to spread the fee across all destinations."));
++                           tr("Transfer <address> <amount>. If the parameter \"index=<N1>[,<N2>,...]\" is specified, the wallet uses outputs received by addresses of those indices. If omitted, the wallet randomly chooses address indices to be used. In any case, it tries its best not to combine outputs across multiple addresses. <priority> is the priority of the transaction. The higher the priority, the higher the transaction fee. Valid values in priority order (from lowest to highest) are: unimportant, normal, elevated, priority. If omitted, the default value (see the command \"set priority\") is used. <ring_size> is the number of inputs to include for untraceability. Multiple payments can be made at once by adding URI_2 or <address_2> <amount_2> etcetera (before the payment ID, if it's included). The \"subtractfeefrom=\" list allows you to choose which destinations to fund the tx fee from instead of the change output. The fee will be split across the chosen destinations proportionally equally. For example, to make 3 transfers where the fee is taken from the first and third destinations, one could do: \"transfer <addr1> 3 <addr2> 0.5 <addr3> 1 subtractfeefrom=0,2\". Let's say the tx fee is 0.1. The balance would drop by exactly 4.5 JET including fees, and addr1 & addr3 would receive 2.925 & 0.975 JET, respectively. Use \"subtractfeefrom=all\" to spread the fee across all destinations."));
+   m_cmd_binder.set_handler("sweep_unmixable",
+                            boost::bind(&simple_wallet::on_command, this, &simple_wallet::sweep_unmixable, _1),
+                            tr("Send all unmixable outputs to yourself with ring_size 1"));
+@@ -3521,7 +3519,7 @@ simple_wallet::simple_wallet()
+                                   "ask-password <0|1|2   (or never|action|decrypt)>\n "
+                                   "  action: ask the password before many actions such as transfer, etc\n "
+                                   "  decrypt: same as action, but keeps the spend key encrypted in memory when not needed\n "
+-                                  "unit <monero|millinero|micronero|nanonero|piconero>\n "
++                                  "unit <JET|mJET|uJET|atomic>\n "
+                                   "  Set the default monero (sub-)unit.\n "
+                                   "min-outputs-count [n]\n "
+                                   "  Try to keep at least that many outputs of value at least min-outputs-value.\n "
+diff --git a/src/version.cpp.in b/src/version.cpp.in
+index 2cfc9a7..e2dd6a6 100644
+--- a/src/version.cpp.in
++++ b/src/version.cpp.in
+@@ -1,5 +1,5 @@
+ #define DEF_MONERO_VERSION_TAG "@VERSIONTAG@"
+-#define DEF_MONERO_VERSION "0.18.5.3"
++#define DEF_MONERO_VERSION "0.1.0-jetcash-dev-monero-0.18.5.3"
+ #define DEF_MONERO_RELEASE_NAME "Fluorine Fermi"
+ #define DEF_MONERO_VERSION_FULL DEF_MONERO_VERSION "-" DEF_MONERO_VERSION_TAG
+ #define DEF_MONERO_VERSION_IS_RELEASE @VERSION_IS_RELEASE@
+diff --git a/src/wallet/CMakeLists.txt b/src/wallet/CMakeLists.txt
+index fa38d06..a6ba47c 100644
+--- a/src/wallet/CMakeLists.txt
++++ b/src/wallet/CMakeLists.txt
+@@ -101,7 +101,7 @@ if(NOT IOS)
+       ${EXTRA_LIBRARIES})
+   set_property(TARGET wallet_rpc_server
+     PROPERTY
+-      OUTPUT_NAME "monero-wallet-rpc")
++      OUTPUT_NAME "jetcash-wallet-rpc")
+   install(TARGETS wallet_rpc_server DESTINATION bin)
+ endif()
+ 
+diff --git a/src/wallet/wallet2.cpp b/src/wallet/wallet2.cpp
+index 90e0c94..b8e24e5 100644
+--- a/src/wallet/wallet2.cpp
++++ b/src/wallet/wallet2.cpp
+@@ -3482,23 +3482,18 @@ void wallet2::refresh(bool trusted_daemon, uint64_t start_height, uint64_t & blo
+ //----------------------------------------------------------------------------------------------------
+ void check_block_hard_fork_version(cryptonote::network_type nettype, uint8_t hf_version, uint64_t height, bool &wallet_is_outdated, bool &daemon_is_outdated)
+ {
+-  const size_t wallet_num_hard_forks = nettype == TESTNET ? num_testnet_hard_forks
++  const size_t count = nettype == TESTNET ? num_testnet_hard_forks
+     : nettype == STAGENET ? num_stagenet_hard_forks : num_mainnet_hard_forks;
+-  const hardfork_t *wallet_hard_forks = nettype == TESTNET ? testnet_hard_forks
++  const hardfork_t *forks = nettype == TESTNET ? testnet_hard_forks
+     : nettype == STAGENET ? stagenet_hard_forks : mainnet_hard_forks;
+-
+-  wallet_is_outdated = static_cast<size_t>(hf_version) > wallet_num_hard_forks;
+-  if (wallet_is_outdated)
+-    return;
+-
+-  // check block's height falls within wallet's expected range for block's given version
+-  uint64_t start_height = hf_version == 1 ? 0 : wallet_hard_forks[hf_version - 1].height;
+-  uint64_t end_height = static_cast<size_t>(hf_version) + 1 > wallet_num_hard_forks
+-    ? std::numeric_limits<uint64_t>::max()
+-    : wallet_hard_forks[hf_version].height;
+-
+-  daemon_is_outdated = height < start_height || height >= end_height;
+-}
++  wallet_is_outdated = hf_version > forks[count - 1].version;
++  daemon_is_outdated = false;
++  if (wallet_is_outdated) return;
++  uint8_t expected = forks[0].version;
++  for (size_t i = 1; i < count && forks[i].height <= height; ++i)
++    expected = forks[i].version;
++  daemon_is_outdated = hf_version != expected;
++  }
+ //----------------------------------------------------------------------------------------------------
+ void wallet2::pull_and_parse_next_blocks(bool first, bool try_incremental, uint64_t start_height, uint64_t &blocks_start_height, std::list<crypto::hash> &short_chain_history, const std::vector<cryptonote::block_complete_entry> &prev_blocks, const std::vector<parsed_block> &prev_parsed_blocks, std::vector<cryptonote::block_complete_entry> &blocks, std::vector<parsed_block> &parsed_blocks, bool &last, bool &error, std::exception_ptr &exception)
+ {
+@@ -6424,6 +6419,16 @@ bool wallet2::check_hard_fork_version(cryptonote::network_type nettype, const st
+   // a hard fork). Then check if fork has passed rendering versions incompatible
+   if (daemon_hard_forks.size() > 0)
+   {
++    for (size_t i = 0; i < std::min(daemon_hard_forks.size(), wallet_num_hard_forks); ++i)
++    {
++      if (daemon_hard_forks[i].first != wallet_hard_forks[i].version ||
++          daemon_hard_forks[i].second != wallet_hard_forks[i].height)
++      {
++        if (daemon_is_outdated) *daemon_is_outdated = true;
++        if (wallet_is_outdated) *wallet_is_outdated = false;
++        return false;
++      }
++    }
+     bool daemon_outdated = daemon_hard_forks.size() < wallet_num_hard_forks;
+     bool wallet_outdated = daemon_hard_forks.size() > wallet_num_hard_forks;
+ 
+@@ -6458,7 +6463,7 @@ bool wallet2::check_hard_fork_version(cryptonote::network_type nettype, const st
+     // Non-updated daemons won't return daemon_hard_forks in response to
+     // get_version. Fall back to extra call to get_hard_fork_info by version.
+     uint64_t daemon_fork_height;
+-    get_hard_fork_info(wallet_num_hard_forks-1/* wallet expects "double fork" pattern */, daemon_fork_height);
++    get_hard_fork_info(wallet_hard_forks[wallet_num_hard_forks - 1].version, daemon_fork_height);
+     bool daemon_outdated = daemon_fork_height == std::numeric_limits<uint64_t>::max();
+ 
+     if (daemon_is_outdated)
+--- /dev/null
++++ b/src/jetcash_emission.hpp
+@@ -0,0 +1,25 @@
++#pragma once
++#include <algorithm>
++#include <cstdint>
++
++// Shared verbatim with the C++ daemon. No floating-point consensus arithmetic.
++namespace jetcash_policy {
++constexpr std::uint64_t coin = 100'000'000;
++constexpr std::uint64_t cap = 10'000'000 * coin;
++constexpr std::uint64_t interval = 1'000'000;
++constexpr std::uint64_t eras = 29;
++constexpr std::uint64_t last_height = eras * interval + 1;
++constexpr std::uint64_t issued(std::uint64_t height) noexcept {
++    if (height >= last_height) return cap;
++    std::uint64_t total = 0;
++    for (std::uint64_t era = 0; era < eras && height; ++era) {
++        const auto blocks = std::min(height, interval);
++        total += blocks * ((5 * coin) >> era);
++        height -= blocks;
++    }
++    return total;
++}
++constexpr std::uint64_t subsidy(std::uint64_t height) noexcept {
++    return height == 0 || height > last_height ? 0 : issued(height) - issued(height - 1);
++}
++}
+--- /dev/null
++++ b/src/jetcash_reward_tests.cpp
+@@ -0,0 +1,65 @@
++#include "cryptonote_basic/cryptonote_basic_impl.h"
++#include "cryptonote_basic/cryptonote_format_utils.h"
++#include "cryptonote_config.h"
++#include "jetcash_emission.hpp"
++#include <iostream>
++#include <limits>
++#include <stdexcept>
++
++namespace tools {
++void check_block_hard_fork_version(cryptonote::network_type, uint8_t, uint64_t, bool&, bool&);
++}
++
++int main() {
++    unsigned checks = 0;
++    auto require = [&](bool result) {
++        ++checks;
++        if (!result) throw std::runtime_error("engine reward check " + std::to_string(checks));
++    };
++    try {
++        using namespace jetcash_policy;
++        uint64_t reward = 0;
++        for (uint64_t era = 0; era < eras; ++era) {
++            for (const uint64_t height : {era * interval + 1, (era + 1) * interval}) {
++                require(cryptonote::get_block_reward(300000, 1000, issued(height - 1), reward, 16, height));
++                require(reward == subsidy(height));
++            }
++        }
++        require(cryptonote::get_block_reward(300000, 1000, 0, reward, 1, 0) && reward == 0);
++        require(cryptonote::get_block_reward(300000, 1000, issued(last_height - 1), reward, 16, last_height));
++        require(reward == 13'000'000);
++        require(cryptonote::get_block_reward(300000, 1000, cap, reward, 16, last_height + 1) && reward == 0);
++        require(!cryptonote::get_block_reward(300000, 1000, cap + 1, reward, 16, 1));
++        require(!cryptonote::get_block_reward(300000, 1000, UINT64_MAX, reward, 16, 1));
++        require(cryptonote::get_block_reward(300000, 1000, cap - 1, reward, 16, 1) && reward == 1);
++        require(cryptonote::get_block_reward(300000, 450000, 0, reward, 16, 1) && reward < subsidy(1));
++        require(!cryptonote::get_block_reward(300000, 600001, 0, reward, 16, 1));
++        require(cryptonote::get_block_reward(300000, 450000, cap, reward, 16, last_height + 1) && reward == 0);
++        for (const auto point : {8u, 5u, 2u, 0u}) {
++            cryptonote::set_default_decimal_point(point);
++            require(!cryptonote::get_unit().empty());
++        }
++        cryptonote::set_default_decimal_point(8);
++        require(cryptonote::get_unit() == "JET");
++        require(cryptonote::print_money(coin) == "1.00000000");
++        for (const auto network : {cryptonote::MAINNET, cryptonote::TESTNET, cryptonote::STAGENET}) {
++            bool wallet_old, daemon_old;
++            tools::check_block_hard_fork_version(network, 1, 0, wallet_old, daemon_old);
++            require(!wallet_old && !daemon_old);
++            tools::check_block_hard_fork_version(network, 16, 1, wallet_old, daemon_old);
++            require(!wallet_old && !daemon_old);
++            tools::check_block_hard_fork_version(network, 1, 1, wallet_old, daemon_old);
++            require(!wallet_old && daemon_old);
++            tools::check_block_hard_fork_version(network, 2, 1, wallet_old, daemon_old);
++            require(!wallet_old && daemon_old);
++            tools::check_block_hard_fork_version(network, 17, 1, wallet_old, daemon_old);
++            require(wallet_old);
++            tools::check_block_hard_fork_version(network, 16, 0, wallet_old, daemon_old);
++            require(!wallet_old && daemon_old);
++        }
++        std::cout << checks << " actual daemon consensus checks passed\n";
++    } catch (const std::exception& e) {
++        std::cerr << e.what() << '\n';
++        return 1;
++    }
++}

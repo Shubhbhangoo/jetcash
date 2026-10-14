@@ -1,0 +1,18 @@
+JetCash original project code is licensed under BSD-3-Clause; see LICENSE.
+
+JetCash is derived from the Monero Project. No affiliation or endorsement is implied.
+The node/wallet engine is fetched from the revision locked in engine/upstream.json.
+Monero's copyright and BSD-3-Clause terms are retained in engine/LICENSE.monero
+and in the fetched source files. JetCash modifications are visible in
+engine/prepare.py and engine/jetcash.patch.
+
+RandomX and the engine's other dependencies retain their respective copyrights
+and licenses. The pinned engine revision pins its submodules. The build collects
+upstream license notices under its notices directory. Distribution of compiled
+binaries must include the applicable upstream and dependency notices as well as
+JetCash's own license. The source bundle downloads those pinned dependencies at
+build time; it does not contain or sublicense all upstream source code.
+
+This software has no independent JetCash security audit. Enabling a mainnet
+profile does not imply production security or a stronger privacy guarantee than
+Monero or Zcash. See docs/protocol.md for the actual design and limitations.

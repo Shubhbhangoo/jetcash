@@ -1,0 +1,19 @@
+{
+  "name": "JetCash",
+  "profile": "mainnet",
+  "network_uuid": "4a455443-4153-4844-4556-30318d92b710",
+  "genesis_hash": "8da5dc043c31ab7248462f3b17f5b79d2429b27d53c3897993a188a60f9ebea4",
+  "genesis_nonce": 41000,
+  "genesis_issuance_atomic": 0,
+  "coin_atomic": 100000000,
+  "maximum_issuance_atomic": 1000000000000000,
+  "target_seconds": 60,
+  "first_mined_block_version": 16,
+  "p2p_port": 41080,
+  "rpc_port": 41081,
+  "zmq_rpc_port": 41082,
+  "address_prefixes": {"standard": 199, "integrated": 200, "subaddress": 201},
+  "seed_peers": [],
+  "upstream_commit": "22578c3f7d7b4b6dd85ff7daa42a827d97cc53d0",
+  "independently_audited": false
+}

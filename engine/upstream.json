@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/monero-project/monero.git",
+  "tag": "v0.18.5.3",
+  "commit": "22578c3f7d7b4b6dd85ff7daa42a827d97cc53d0",
+  "purpose": "JetCash mainnet and isolated test profiles; independently unaudited fork",
+  "license": "BSD-3-Clause; retain upstream and dependency notices"
+}

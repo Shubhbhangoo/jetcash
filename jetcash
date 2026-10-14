@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+"""Portable entry point for the JetCash node/wallet manager."""
+from pathlib import Path
+import os
+import subprocess
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "engine"))
+from cli import main
+
+if __name__ == "__main__":
+    if os.name == "nt":
+        print("On Windows use .\\jetcash.ps1, or run python3 jetcash inside Ubuntu WSL.", file=sys.stderr)
+        sys.exit(1)
+    try:
+        sys.exit(main())
+    except (RuntimeError, OSError, subprocess.SubprocessError) as error:
+        print(f"JetCash: {error}", file=sys.stderr)
+        sys.exit(1)
